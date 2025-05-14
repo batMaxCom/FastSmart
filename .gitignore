@@ -1,0 +1,7 @@
+.env
+vk_bot.log
+/.idea
+client_key.json
+launch_points.json
+.venv/
+__pycache__/
