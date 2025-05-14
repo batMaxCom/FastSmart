@@ -66,6 +66,11 @@ async def set_volume(value: int):
     return {"volume": value}
 
 
+@app.get("/mute")
+async def get_power():
+    result = await execute_command(CommandEnum.VOLUME_STATUS)
+    return {"value": result["payload"].get("mute", False)}
+
 @app.get("/mute/toggle")
 async def mute_toggle():
     current = await execute_command(CommandEnum.VOLUME_STATUS)
