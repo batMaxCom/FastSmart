@@ -11,7 +11,7 @@ logging.basicConfig(
     handlers=[logging.StreamHandler()]
 )
 
-TV_IP = os.getenv("TV_IP")
+TV_IP = os.getenv("TV_IP") or "localhost"
 PORT = 3000
 CLIENT_KEY_FILE = "client_key.json"
 
