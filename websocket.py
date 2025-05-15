@@ -5,6 +5,12 @@ import os
 
 import websockets
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[logging.StreamHandler()]
+)
+
 TV_IP = os.getenv("TV_IP")
 PORT = 3000
 CLIENT_KEY_FILE = "client_key.json"
@@ -22,6 +28,7 @@ class LGWebOSClient:
         self.lock = asyncio.Lock()
 
     async def connect(self):
+        """Подключение к WebSocket серверу."""
         async with self.lock:
             if self.connected or self.connecting:
                 return
@@ -92,8 +99,13 @@ class LGWebOSClient:
             self.connecting = False
 
     async def send_command(self, command_name, uri, payload):
+        """Отправка команды на телевизор."""
+        # Проверка состояния подключения
         if not self.connected:
+            logging.info("WebSocket не подключен, пытаемся переподключиться...")
             await self.connect()
+
+        # Если по-прежнему не удалось подключиться
         if not self.connected:
             raise ConnectionError("Не удалось подключиться к телевизору")
 
@@ -103,9 +115,23 @@ class LGWebOSClient:
             "uri": uri,
             "payload": payload
         }
-        await self.websocket.send(json.dumps(command))
-        async for message in self.websocket:
-            return message
+
+        try:
+            # Отправка команды
+            await self.websocket.send(json.dumps(command))
+
+            # Ожидание ответа от WebSocket
+            async for message in self.websocket:
+                return message
+        except websockets.exceptions.ConnectionClosed:
+            logging.warning("Соединение с WebSocket закрыто. Переподключение...")
+            self.connected = False
+            await self.connect()
+            # Повторная попытка отправить команду после переподключения
+            return await self.send_command(command_name, uri, payload)
+        except Exception as e:
+            logging.error(f"Ошибка при отправке команды: {e}")
+            raise
 
 
 tv_client = LGWebOSClient()
