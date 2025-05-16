@@ -2,6 +2,8 @@ import asyncio
 import json
 import logging
 import os
+from dotenv import load_dotenv
+
 
 import websockets
 
@@ -10,6 +12,8 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[logging.StreamHandler()]
 )
+
+load_dotenv()
 
 TV_IP = os.getenv("TV_IP") or "localhost"
 PORT = 3000
@@ -29,6 +33,7 @@ class LGWebOSClient:
 
     async def connect(self):
         """Подключение к WebSocket серверу."""
+        print(self.ip)
         async with self.lock:
             if self.connected or self.connecting:
                 return

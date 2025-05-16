@@ -4,14 +4,11 @@ import logging
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
-from dotenv import load_dotenv
 
 from commands import CommandEnum
 from websocket import tv_client
 
 from fastapi.middleware.gzip import GZipMiddleware
-
-load_dotenv()
 
 logging.basicConfig(
     level=logging.INFO,
