@@ -36,7 +36,6 @@ async def get_power():
     return JSONResponse(content={"value": result["payload"].get("returnValue", False)})
 
 
-
 @app.get("/power/off")
 async def power_off():
     await execute_command(CommandEnum.POWER_OFF)
@@ -81,6 +80,36 @@ async def mute_toggle():
     is_muted = current["payload"].get("mute", False)
     await execute_command(CommandEnum.MUTE_TOGGLE, mute=not is_muted)
     return JSONResponse(content={"value": not is_muted})
+
+
+@app.get("/play")
+async def play():
+    await execute_command(CommandEnum.PLAY)
+    return JSONResponse(content={"value": True})
+
+
+@app.get("/pause")
+async def pause():
+    await execute_command(CommandEnum.PAUSE)
+    return JSONResponse(content={"value": True})
+
+
+@app.get("/stop")
+async def stop():
+    await execute_command(CommandEnum.STOP)
+    return JSONResponse(content={"value": True})
+
+
+@app.get("/back")
+async def back():
+    await execute_command(CommandEnum.BACK)
+    return JSONResponse(content={"value": True})
+
+
+@app.get("/second")
+async def second():
+    await execute_command(CommandEnum.SECOND)
+    return JSONResponse(content={"value": True})
 
 
 if __name__ == "__main__":

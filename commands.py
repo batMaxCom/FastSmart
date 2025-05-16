@@ -9,6 +9,12 @@ class CommandEnum(Enum):
     VOLUME_UP = ("Увеличить громкость", "ssap://audio/volumeUp", {})
     VOLUME_DOWN = ("Уменьшить громкость", "ssap://audio/volumeDown", {})
     MUTE_TOGGLE = ("Включить/выключить звук", "ssap://audio/setMute", {"mute": None})
+    PLAY = ("Воспроизведение", "ssap://media.controls/play", {})
+    PAUSE = ("Пауза", "ssap://media.controls/pause", {})
+    STOP = ("Остановить", "ssap://media.controls/stop", {})
+    BACK = ("Перемотка назад", "ssap://media.controls/rewind", {})
+    SECOND = ("Перемотка вперёд", "ssap://media.controls/fastForward", {})
+    SET_CHANNEL = ("Установить канал", "ssap://tv/openChannel", {"channelId": None})
 
     def __init__(self, name, uri, payload_template):
         self.command_name = name
