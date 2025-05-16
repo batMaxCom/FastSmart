@@ -82,33 +82,64 @@ async def mute_toggle():
     return JSONResponse(content={"value": not is_muted})
 
 
-@app.get("/play")
 async def play():
     await execute_command(CommandEnum.PLAY)
     return JSONResponse(content={"value": True})
 
 
-@app.get("/pause")
 async def pause():
     await execute_command(CommandEnum.PAUSE)
     return JSONResponse(content={"value": True})
 
 
-@app.get("/stop")
 async def stop():
     await execute_command(CommandEnum.STOP)
     return JSONResponse(content={"value": True})
 
 
-@app.get("/back")
 async def back():
     await execute_command(CommandEnum.BACK)
     return JSONResponse(content={"value": True})
 
 
-@app.get("/second")
-async def second():
+async def back_to_minute():
+    await execute_command(CommandEnum.BACK)
+    await execute_command(CommandEnum.BACK)
+    await execute_command(CommandEnum.BACK)
+    return JSONResponse(content={"value": True})
+
+
+async def second_time():
     await execute_command(CommandEnum.SECOND)
+    return JSONResponse(content={"value": True})
+
+
+async def second_to_minute():
+    await execute_command(CommandEnum.SECOND)
+    await execute_command(CommandEnum.SECOND)
+    await execute_command(CommandEnum.SECOND)
+    return JSONResponse(content={"value": True})
+
+
+@app.get("/player/{value}")
+async def second(value: str):
+    match value:
+        case "auto":
+            await play()
+        case "eco":
+            await pause()
+        case "quiet":
+            await stop()
+        case "express":
+            await second_time()
+        case "glass":
+            await back()
+        case "intensive":
+            await back_to_minute()
+        case "pre_rinse":
+            await second_to_minute()
+        case _:
+            pass
     return JSONResponse(content={"value": True})
 
 
