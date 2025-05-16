@@ -3,10 +3,13 @@ import logging
 
 import uvicorn
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 
 from commands import CommandEnum
 from websocket import tv_client
+
+from fastapi.middleware.gzip import GZipMiddleware
 
 load_dotenv()
 
@@ -17,6 +20,8 @@ logging.basicConfig(
 )
 
 app = FastAPI()
+
+app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=5)
 
 
 async def execute_command(command_enum: CommandEnum, **payload_kwargs):
@@ -31,52 +36,54 @@ async def execute_command(command_enum: CommandEnum, **payload_kwargs):
 @app.get("/power")
 async def get_power():
     result = await execute_command(CommandEnum.POWER_STATE)
-    return {"value": result["payload"].get("returnValue", False)}
+    return JSONResponse(content={"value": result["payload"].get("returnValue", False)})
+
 
 
 @app.get("/power/off")
 async def power_off():
     await execute_command(CommandEnum.POWER_OFF)
-    return {"power": False}
+    return JSONResponse(content={"power": False})
 
 
 @app.get("/volume")
 async def get_volume():
     result = await execute_command(CommandEnum.VOLUME_STATUS)
-    return {"value": result["payload"].get("volume", 0)}
+    return JSONResponse(content={"value": result["payload"].get("volume", 0)})
 
 
 @app.get("/volume/up")
 async def volume_up():
     await execute_command(CommandEnum.VOLUME_UP)
     result = await execute_command(CommandEnum.VOLUME_STATUS)
-    return {"value": result["payload"].get("volume", 0)}
+    return JSONResponse(content={"value": result["payload"].get("volume", 0)})
 
 
 @app.get("/volume/down")
 async def volume_down():
     await execute_command(CommandEnum.VOLUME_DOWN)
     result = await execute_command(CommandEnum.VOLUME_STATUS)
-    return {"value": result["payload"].get("volume", 0)}
+    return JSONResponse(content={"value": result["payload"].get("volume", 0)})
 
 
 @app.get("/volume/set/{value}")
 async def set_volume(value: int):
     await execute_command(CommandEnum.VOLUME_SET, volume=value)
-    return {"volume": value}
+    return JSONResponse(content={"volume": value})
 
 
 @app.get("/mute")
 async def get_power():
     result = await execute_command(CommandEnum.VOLUME_STATUS)
-    return {"value": result["payload"].get("mute", False)}
+    return JSONResponse(content={"value": result["payload"].get("mute", False)})
+
 
 @app.get("/mute/toggle")
 async def mute_toggle():
     current = await execute_command(CommandEnum.VOLUME_STATUS)
     is_muted = current["payload"].get("mute", False)
     await execute_command(CommandEnum.MUTE_TOGGLE, mute=not is_muted)
-    return {"value": not is_muted}
+    return JSONResponse(content={"value": not is_muted})
 
 
 if __name__ == "__main__":
